@@ -1,0 +1,147 @@
+"Phrases"
+{
+    "Prefix"
+    {
+        "en"    "{RED} Duel |"
+        "ru"    "{RED} Duel |"
+        "ua"    "{RED} Duel |"
+    }
+    "Duels_DefaultDiplayName"
+    {
+        "en"    "Default"
+        "ru"    "Стандартный"
+        "ua"    "Стандартний"
+    }
+    "Duels_GGWinner"
+    {
+        "en"    "The duel is {GREEN}over{DEFAULT}! Winner: %s"
+        "ru"    "Дуэль {GREEN}окончена{DEFAULT}! Победитель: %s"
+        "ua"    "Дуель {GREEN}завершено{DEFAULT}! Переможець: %s"
+    }
+    "Duels_TimeEnd"
+    {
+        "en"    "The duel is over! Time is up."
+        "ru"    "Дуэль окончена! Время вышло."
+        "ua"    "Дуель завершено! Час вийшов."
+    }
+    "Duels_ArmorMenuTitle"
+    {
+        "en"    "Choose Armor"
+        "ru"    "Выберите броню"
+        "ua"    "Оберіть броню"
+    }
+    "Duels_HPMenuTitle"
+    {
+        "en"    "Choose Health"
+        "ru"    "Выберите здоровье"
+        "ua"    "Оберіть здоров'я"
+    }
+    "Duels_TargetMenuTitle"
+    {
+        "en"    "Choose an Opponent"
+        "ru"    "Выберите оппонента"
+        "ua"    "Оберіть опонента"
+    }
+    "Duels_NoAvailableOpponents"
+    {
+        "en"    "No available opponents"
+        "ru"    "Нет доступных оппонентов"
+        "ua"    "Немає доступних опонентів"
+    }
+    "Duels_ModificatorMenuTitle"
+    {
+        "en"    "Choose a Modifier"
+        "ru"    "Выберите модификатор"
+        "ua"    "Оберіть модифікатор"
+    }
+    "Duels_ModificatorDefault"
+    {
+        "en"    "Default"
+        "ru"    "Стандартный"
+        "ua"    "Стандартний"
+    }
+    "Duels_ModificatorNoZoom"
+    {
+        "en"    "No Zoom"
+        "ru"    "Без прицела"
+        "ua"    "Без прицілу"
+    }
+    "Duels_ModificatorOneBullet"
+    {
+        "en"    "One Bullet"
+        "ru"    "Одна пуля"
+        "ua"    "Одна куля"
+    }
+    "Duels_ModificatorKnifeOnly"
+    {
+        "en"    "Knives Only"
+        "ru"    "Только ножи"
+        "ua"    "Тільки ножі"
+    }
+    "Duels_ModificatorOneHP"
+    {
+        "en"    "One HP"
+        "ru"    "Одно ХП"
+        "ua"    "Одне ХП"
+    }
+    "Duels_WeaponMenuTitle"
+    {
+        "en"    "Choose a Weapon"
+        "ru"    "Выберите оружие"
+        "ua"    "Оберіть зброю"
+    }
+    "Duels_HubMenuTitle"
+    {
+        "en"    "Duel Settings"
+        "ru"    "Настройка дуэли"
+        "ua"    "Налаштування дуелі"
+    }
+    "Duels_TargetInfoButton"
+    {
+        "en"    "Opponent: [%s]"
+        "ru"    "Оппонент: [%s]"
+        "ua"    "Опонент: [%s]"
+    }
+    "Duels_NoOpponent"
+    {
+        "en"    "Not selected"
+        "ru"    "Не выбран"
+        "ua"    "Не обрано"
+    }
+    "Duels_ModificatorInfoButton"
+    {
+        "en"    "Modifier: [%s]"
+        "ru"    "Модификатор: [%s]"
+        "ua"    "Модифікатор: [%s]"
+    }
+    "Duels_WeaponInfoButton"
+    {
+        "en"    "Weapon: [%s]"
+        "ru"    "Оружие: [%s]"
+        "ua"    "Зброя: [%s]"
+    }
+    "Duels_HPInfoButton"
+    {
+        "en"    "Health: [%i]"
+        "ru"    "Здоровье: [%i]"
+        "ua"    "Здоров'я: [%i]"
+    }
+    "Duels_ArmorInfoButton"
+    {
+        "en"    "Armor: [%i]"
+        "ru"    "Броня: [%i]"
+        "ua"    "Броня: [%i]"
+    }
+    "Duel_StartButton"
+    {
+        "en"    "Start Duel"
+        "ru"    "Начать дуэль"
+        "ua"    "Почати дуель"
+    }
+    "Duels_DuelLRButton"
+    {
+        "en"    "Duel with a Guard"
+        "ru"    "Дуэль с охраной"
+        "ua"    "Дуель з охороною"
+    }
+}
