@@ -1031,7 +1031,6 @@ void CheckPosMenu(int iSlot){
         }
 
         CheckingPosMenu(iSlot,curMapName.c_str(),szBack);
-        PrintSlotPrefixed(iSlot, GetTranslation("Duels_PositionDeleted")); 
     });
     menus_api->DisplayPlayerMenu(hMenu,iSlot,true,true);
 }
@@ -1374,7 +1373,6 @@ void jb_lr_duels::AllPluginsLoaded() {
     });
 
     utils->AddChatListenerPre(g_PLID, [](int iSlot, const char* szContent, bool bTeam){
-        META_CONPRINTF("User input slot %i | Input: %s\n",iSlot,szContent);
         if (!bWaitingCustomTextSlot[iSlot]) return true;
         std::string sInput = szContent;
         sInput.erase(std::remove(sInput.begin(), sInput.end(), '\"'), sInput.end());
