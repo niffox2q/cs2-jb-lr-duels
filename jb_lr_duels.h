@@ -15,9 +15,12 @@ class CBasePlayerController;
 #include <complex>
 #include <iomanip>
 #include "metamod_oslink.h"
-#include "include/menus.h"
 #include "entity2/entitykeyvalues.h"
+
+#include "include/menus.h"
+#include "include/admin.h"
 #include "include/jailbreak_api.h"
+#include "CBaseGrenade.h"
 
 
 
