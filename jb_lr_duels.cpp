@@ -1398,6 +1398,45 @@ void jb_lr_duels::AllPluginsLoaded() {
         return false;
     });
 
+    utils->HookOnTakeDamagePre(g_PLID, [](int iSlot, CTakeDamageInfo *pInfo) {
+        if (!g_bDuelStarted) return true; 
+
+        auto AttackerHandle = pInfo->m_hAttacker.Get();
+        if (!AttackerHandle.IsValid()) return true;
+
+        auto pAttackerEntity = AttackerHandle.Get();
+        if (!pAttackerEntity) return true;
+
+        int iAttackerSlot = -1;
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+            auto pController = CCSPlayerController::FromSlot(i);
+            if (!pController) continue;
+
+            auto pPawn = pController->GetPlayerPawn();
+            if (pPawn && pPawn == pAttackerEntity) { 
+                iAttackerSlot = i;
+                break;
+            }
+        }
+
+        bool bVictimInDuel = (iSlot == g_Duel.iInitiatorSlot || iSlot == g_Duel.iTargetSlot);
+        bool bAttackerInDuel = (iAttackerSlot == g_Duel.iInitiatorSlot || iAttackerSlot == g_Duel.iTargetSlot);
+
+
+        if (bVictimInDuel) {
+            if (iAttackerSlot != -1 && !bAttackerInDuel) {
+                return false;
+            }
+        } 
+        else if (bAttackerInDuel) {
+            if (!bVictimInDuel) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+
     utils->RegCommand(g_PLID,{"mm_jb_duels"},{"!jb_duels"},OnAdminCommand);
 
     utils->StartupServer(g_PLID, StartupServer);
@@ -1420,4 +1459,4 @@ const char* jb_lr_duels::GetLicense() { return "GPL"; }
 const char* jb_lr_duels::GetLogTag() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetName() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetURL() { return "https://t.me/niffox_2q"; }
-const char* jb_lr_duels::GetVersion() { return "1.1.0"; }
+const char* jb_lr_duels::GetVersion() { return "1.1.1"; }
