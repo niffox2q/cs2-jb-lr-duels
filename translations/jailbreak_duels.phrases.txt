@@ -144,4 +144,186 @@
         "ru"    "Дуэль с охраной"
         "ua"    "Дуель з охороною"
     }
+    "Duels_PrisonerStartedDuel"
+    {
+        "en"    "The prisoner has started a duel. 5 seconds until start. Get ready!"
+        "ru"    "Заключенный начал дуэль. До начала 5 секунд. Готовьтесь!"
+        "ua"    "Ув'язнений розпочав дуель. До початку 5 секунд. Готуйтеся!"
+    }
+    "Duels_DefaultModificationDescription"
+    {
+        "en"    "Standard mode, all settings are available."
+        "ru"    "Стандартный режим, все настройки доступны."
+        "ua"    "Стандартний режим, всі налаштування доступні."
+    }
+    "Duels_NoZoomModificationDescription"
+    {
+        "en"    "No-Zoom mode, only sniper rifles available."
+        "ru"    "Режим Без прицела, в меню оружия доступны только снайперки."
+        "ua"    "Режим Без прицілу, в меню зброї доступні лише снайперки."
+    }
+    "Duels_OneBulletModificationDescription"
+    {
+        "en"    "One-Bullet mode, players take turns shooting."
+        "ru"    "В данном режиме игроки производят выстрел по очереди."
+        "ua"    "У цьому режимі гравці роблять постріл по черзі."
+    }
+    "Duels_OneHPModificationDescription"
+    {
+        "en"    "One-HP mode, players throw decoys at each other."
+        "ru"    "В режиме 'Одно ХП', игроки бросают друг в друга ложные гранаты."
+        "ua"    "У режимі 'Одне ХП', гравці кидають один в одного хибні гранати."
+    }
+    "Duels_KnifeOnlyModificationDescription"
+    {
+        "en"    "Knife-Only mode, weapons cannot be changed."
+        "ru"    "В режиме 'Только ножи', игроки сражаются используя только нож, сменить оружие нельзя."
+        "ua"    "У режимі 'Тільки ножі', гравці б'ються використовуючи лише ніж, змінити зброю не можна."
+    }
+    "Duels_TargetNotFound"
+    {
+        "en"    "Failed to identify opponent, please select another."
+        "ru"    "Не удалось определить оппонента, выберите другого."
+        "ua"    "Не вдалося визначити опонента, оберіть іншого."
+    }
+    "Duels_TargetIsDead"
+    {
+        "en"    "Failed to start duel, your opponent is already dead."
+        "ru"    "Не удалось начать дуэль, ваш оппонент уже мёртв."
+        "ua"    "Не вдалося розпочати дуель, ваш опонент вже мертвий."
+    }
+    "Duels_YouCantStartCuzDead"
+    {
+        "en"    "You cannot start a duel while you are dead."
+        "ru"    "Вы не можете начать дуэль, так как вы мертвы."
+        "ua"    "Ви не можете розпочати дуель, оскільки ви мертві."
+    }
+    "Duels_NoPermission"
+    {
+        "en"    "You do not have access."
+        "ru"    "У вас нет доступа."
+        "ua"    "У вас немає доступу."
+    }
+    "Duels_TPZekPos"
+    {
+        "en"    "Teleport to T position"
+        "ru"    "Телепортироваться на позицию Т"
+        "ua"    "Телепортуватися на позицію Т"
+    }
+    "Duels_TPGuardPos"
+    {
+        "en"    "Teleport to CT position"
+        "ru"    "Телепортироваться на позицию КТ"
+        "ua"    "Телепортуватися на позицію КТ"
+    }
+    "Duels_CheckPosTitle"
+    {
+        "en"    "Check positions"
+        "ru"    "Проверка позиций"
+        "ua"    "Перевірка позицій"
+    }
+    "Duels_NoAvailableMapPositions"
+    {
+        "en"    "No available positions on this map."
+        "ru"    "Нет доступных позиций на данной карте."
+        "ua"    "Немає доступних позицій на цій карті."
+    }
+    "Duels_PositionDeleted"
+    {
+        "en"    "Position successfully deleted."
+        "ru"    "Позиция успешно удалена."
+        "ua"    "Позицію успішно видалено."
+    }
+    "Duels_DeletePosTitle"
+    {
+        "en"    "Delete positions"
+        "ru"    "Удаление позиций"
+        "ua"    "Видалення позицій"
+    }
+    "Duels_CreatePosTitle"
+    {
+        "en"    "Create position"
+        "ru"    "Создать позицию"
+        "ua"    "Створити позицію"
+    }
+    "Duels_SaveTPos"
+    {
+        "en"    "Save T position"
+        "ru"    "Сохранить позицию для Т"
+        "ua"    "Зберегти позицію для Т"
+    }
+    "Duels_SaveCTPos"
+    {
+        "en"    "Save CT position"
+        "ru"    "Сохранить позицию для КТ"
+        "ua"    "Зберегти позицію для КТ"
+    }
+    "Duels_SavePos"
+    {
+        "en"    "Save positions"
+        "ru"    "Сохранить позиции"
+        "ua"    "Зберегти позиції"
+    }
+    "Duels_ReturnButton"
+    {
+        "en"    "Return"
+        "ru"    "Вернуться"
+        "ua"    "Повернутися"
+    }
+    "Duels_TPosSaved"
+    {
+        "en"    "Position for T side saved successfully."
+        "ru"    "Позиция для Т стороны успешно сохранена."
+        "ua"    "Позицію для Т сторони успішно збережено."
+    }
+    "Duels_CTPosSaved"
+    {
+        "en"    "Position for CT side saved successfully."
+        "ru"    "Позиция для КТ стороны успешно сохранена."
+        "ua"    "Позицію для КТ сторони успішно збережено."
+    }
+    "Duels_NoTPosInstalled"
+    {
+        "en"    "Failed to save. T position not set."
+        "ru"    "Не удалось сохранить. Позиция для Т не установлена."
+        "ua"    "Не вдалося зберегти. Позицію для Т не встановлено."
+    }
+    "Duels_NoCTPosInstalled"
+    {
+        "en"    "Failed to save. CT position not set."
+        "ru"    "Не удалось сохранить. Позиция для КТ не установлена."
+        "ua"    "Не вдалося зберегти. Позицію для КТ не встановлено."
+    }
+    "Duels_EnterKeyName"
+    {
+        "en"    "Enter a unique name (no spaces/symbols). E.g: BoxTSpawn"
+        "ru"    "Введите уникальное название (без пробелов/спец. символов). Пример: BoxTSpawn"
+        "ua"    "Введіть унікальну назву (без пробілів/спец. символів). Приклад: BoxTSpawn"
+    }
+    "Duels_AdminMenuTitle"
+    {
+        "en"    "Position management"
+        "ru"    "Управление позициями"
+        "ua"    "Керування позиціями"
+    }
+    "Duels_CreateNewPos"
+    {
+        "en"    "Create position"
+        "ru"    "Создать позицию"
+        "ua"    "Створити позицію"
+    }
+    "Duels_DeletePos"
+    {
+        "en"    "Delete position"
+        "ru"    "Удалить позицию"
+        "ua"    "Видалити позицію"
+    }
+    "Duels_CheckPos"
+    {
+        "en"    "Check position"
+        "ru"    "Проверить позицию"
+        "ua"    "Перевірити позицію"
+    }
+
+
 }
