@@ -2,9 +2,9 @@
 {
     "Prefix"
     {
-        "en"    "{RED} Duel |"
-        "ru"    "{RED} Duel |"
-        "ua"    "{RED} Duel |"
+        "en"    " {RED} Duel {DEFAULT}|"
+        "ru"    " {RED} Duel {DEFAULT}|"
+        "ua"    " {RED} Duel {DEFAULT}|"
     }
     "Duels_DefaultDiplayName"
     {
@@ -323,6 +323,12 @@
         "en"    "Check position"
         "ru"    "Проверить позицию"
         "ua"    "Перевірити позицію"
+    }
+    "Duels_PositionSaved"
+    {
+        "en"    "Position saved successfully"
+        "ru"    "Позиция успешно сохранена"
+        "ua"    "Позицію успішно збережено"
     }
 
 
