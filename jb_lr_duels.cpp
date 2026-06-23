@@ -454,6 +454,8 @@ void StartDuel() {
     g_Duel.iDuelSessionId++;
     int iCapturedSession = g_Duel.iDuelSessionId;
 
+    g_bDuelStarted = true;
+
     utils->CreateTimer(5.0f, [iCapturedSession]() {
 
         if (g_Duel.iDuelSessionId != iCapturedSession || !g_Duel.IsActive()) {
