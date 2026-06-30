@@ -34,9 +34,6 @@ struct PositionInfo{
 
     Vector vPrisonerLocation;
     Vector vGuardLocation;
-
-    QAngle qaPrisonerRotation;
-    QAngle qaGuardRotation;
 };
 
 struct DuelPosition{
@@ -90,14 +87,10 @@ void LoadDuelPositions() {
             posInfo.KeyName = pLocKey->GetName();
 
             const char* pLoc = pLocKey->GetString("prisoner_location", "0 0 0");
-            const char* pAng = pLocKey->GetString("prisoner_angle", "0 0 0");
             const char* gLoc = pLocKey->GetString("guard_location", "0 0 0");
-            const char* gAng = pLocKey->GetString("guard_angle", "0 0 0");
 
             sscanf(pLoc, "%f %f %f", &posInfo.vPrisonerLocation.x, &posInfo.vPrisonerLocation.y, &posInfo.vPrisonerLocation.z);
-            sscanf(pAng, "%f %f %f", &posInfo.qaPrisonerRotation.x, &posInfo.qaPrisonerRotation.y, &posInfo.qaPrisonerRotation.z);
             sscanf(gLoc, "%f %f %f", &posInfo.vGuardLocation.x, &posInfo.vGuardLocation.y, &posInfo.vGuardLocation.z);
-            sscanf(gAng, "%f %f %f", &posInfo.qaGuardRotation.x, &posInfo.qaGuardRotation.y, &posInfo.qaGuardRotation.z);
 
             duelMap.vPositions.push_back(posInfo);
         }
@@ -105,68 +98,6 @@ void LoadDuelPositions() {
     }
     
     delete kv;
-}
-
-void SaveNewDuelPosition(const char* szMapName, const char* szLocationName, Vector vPLoc, QAngle qaPAng, Vector vGLoc, QAngle qaGAng) {
-    KeyValues* kv = new KeyValues("Maps");
-    const char* path = "addons/configs/Jailbreak/lr_duels_maps.ini";
-
-    kv->LoadFromFile(g_pFullFileSystem, path);
-
-    KeyValues* pMapKey = kv->FindKey(szMapName, true);
-
-    KeyValues* pLocKey = pMapKey->FindKey(szLocationName, true);
-
-    char buf[128];
-
-    snprintf(buf, sizeof(buf), "%f %f %f", vPLoc.x, vPLoc.y, vPLoc.z);
-    pLocKey->SetString("prisoner_location", buf);
-
-    snprintf(buf, sizeof(buf), "%f %f %f", qaPAng.x, qaPAng.y, qaPAng.z);
-    pLocKey->SetString("prisoner_angle", buf);
-
-    snprintf(buf, sizeof(buf), "%f %f %f", vGLoc.x, vGLoc.y, vGLoc.z);
-    pLocKey->SetString("guard_location", buf);
-
-    snprintf(buf, sizeof(buf), "%f %f %f", qaGAng.x, qaGAng.y, qaGAng.z);
-    pLocKey->SetString("guard_angle", buf);
-
-    kv->SaveToFile(g_pFullFileSystem, path);
-    delete kv;
-
-    LoadDuelPositions();
-}
-
-void RemoveDuelPosition(const char* szMapName, const char* szLocationName) {
-    KeyValues* kv = new KeyValues("Maps");
-    const char* path = "addons/configs/Jailbreak/lr_duels_maps.ini";
-    
-    if (kv->LoadFromFile(g_pFullFileSystem, path)) {
-        KeyValues* pMapKey = kv->FindKey(szMapName);
-        if (pMapKey) {
-            KeyValues* pLocKey = pMapKey->FindKey(szLocationName);
-            if (pLocKey) {
-                pMapKey->RemoveSubKey(pLocKey);
-                pLocKey->deleteThis();          
-                kv->SaveToFile(g_pFullFileSystem, path); 
-            }
-        }
-    }
-    delete kv;
-
-    for (auto& duelpos : g_DuelPositions) {
-        if (duelpos.sMapName == szMapName) {
-            auto& positions = duelpos.vPositions;
-            positions.erase(std::remove_if(positions.begin(), positions.end(),
-                [&szLocationName](const PositionInfo& pos) { 
-                    return pos.KeyName == szLocationName; 
-                }), 
-                positions.end()
-            );
-            break; 
-        }
-    }
-    LoadDuelPositions();
 }
 
 void LoadConfig() {
@@ -228,6 +159,14 @@ void PrintAllPrefixed(const char* content) {
     char buf[512];
     g_SMAPI->Format(buf, sizeof(buf), "%s %s", GetTranslation("Prefix"), content);
     utils->PrintToChatAll("%s",buf);
+}
+
+
+CON_COMMAND_F(mm_lr_duels_reload,"Reload LR Duels",FCVAR_NONE) {
+    LoadDuelPositions();
+    LoadConfig();
+    LoadTranslations();
+    META_CONPRINTF("Good.\n");
 }
 
 ConVarRefAbstract* FindConVar(const char* sCvarName)
@@ -321,6 +260,7 @@ void DisableInfinityAmmo() {
 }
 
 void EndDuel(int iWinner){
+    jailbreak_api->RemoveRebelImmunity(g_Duel.iInitiatorSlot);
     g_Duel.Reset();
     players_api->RemoveWeapons(iWinner);
     g_bDuelStarted = false;
@@ -434,8 +374,8 @@ void StartDuel() {
     }
     
     if (bArenaFound) {
-        players_api->Teleport(g_Duel.iInitiatorSlot, &selectedArena.vPrisonerLocation, &selectedArena.qaPrisonerRotation, nullptr);
-        players_api->Teleport(g_Duel.iTargetSlot, &selectedArena.vGuardLocation, &selectedArena.qaGuardRotation, nullptr);
+        players_api->Teleport(g_Duel.iInitiatorSlot, &selectedArena.vPrisonerLocation, nullptr, nullptr);
+        players_api->Teleport(g_Duel.iTargetSlot, &selectedArena.vGuardLocation, nullptr, nullptr);
     }
 
     tPawn->m_iHealth     = g_Duel.iHP;
@@ -454,6 +394,7 @@ void StartDuel() {
     g_Duel.iDuelSessionId++;
     int iCapturedSession = g_Duel.iDuelSessionId;
 
+    jailbreak_api->GiveRebelImmunity(iSlot);
     g_bDuelStarted = true;
 
     utils->CreateTimer(5.0f, [iCapturedSession]() {
@@ -466,6 +407,7 @@ void StartDuel() {
         auto pCT = CCSPlayerController::FromSlot(g_Duel.iTargetSlot);
         if (!pT || !pCT || !pT->GetPlayerPawn() || !pCT->GetPlayerPawn() || 
             !pT->GetPlayerPawn()->IsAlive() || !pCT->GetPlayerPawn()->IsAlive()) {
+            jailbreak_api->RemoveRebelImmunity(g_Duel.iInitiatorSlot);
             g_Duel.Reset();
             return -1.0f;
         }
@@ -921,311 +863,6 @@ void DuelHubMenu(int iSlot){
 
 }
 
-void OpenAdminMenu(int iSlot);
-void DeletePosMenu(int iSlot);
-
-void CheckingPosMenu(int iSlot, const char* szMapName, const char* szPosKey){
-    if (iSlot < 0 || iSlot > MAX_PLAYERS) return;
-    if (!admin_api->IsAdmin(iSlot) || !admin_api->HasPermission(iSlot, g_sAdminPermission.c_str())) {
-        PrintSlotPrefixed(iSlot, GetTranslation("Duels_NoPermission"));
-        return;
-    }
-
-    Menu hMenu;
-    menus_api->SetTitleMenu(hMenu, szPosKey);
-    menus_api->AddItemMenu(hMenu, "zek", GetTranslation("Duels_TPZekPos"), ITEM_DEFAULT);
-    menus_api->AddItemMenu(hMenu, "guard", GetTranslation("Duels_TPGuardPos"), ITEM_DEFAULT);
-
-    menus_api->SetBackMenu(hMenu, true);
-    menus_api->SetExitMenu(hMenu, true);
-
-    std::string sMap(szMapName);
-    std::string sKey(szPosKey);
-
-    menus_api->SetCallback(hMenu, [sMap, sKey](const char* szBack, const char* szFront, int iItem, int iSlot) {
-        if (!szBack || szBack[0] == '\0') return;
-        
-        if (strcmp(szBack, "exit") == 0) {
-            menus_api->ClosePlayerMenu(iSlot);
-            return;
-        }
-        if (strcmp(szBack, "back") == 0) {
-            OpenAdminMenu(iSlot); 
-            return;
-        }
-
-        PositionInfo position;
-        bool bFound = false;
-
-        for (const auto& duelpos : g_DuelPositions) {
-            if (duelpos.sMapName == sMap) {
-                for (const auto& pos : duelpos.vPositions) {
-                    if (pos.KeyName == sKey) {
-                        position = pos;
-                        bFound = true;
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-
-        if (!bFound) return;
-
-        auto pController = CCSPlayerController::FromSlot(iSlot);
-        if (!pController) return;
-        auto pPawn = pController->GetPlayerPawn();
-        if (!pPawn || !pPawn->IsAlive()) return;
-
-        if (strcmp(szBack, "zek") == 0) {
-            players_api->Teleport(iSlot, &position.vPrisonerLocation, &position.qaPrisonerRotation, nullptr);
-        }
-        else if (strcmp(szBack, "guard") == 0) {
-            players_api->Teleport(iSlot, &position.vGuardLocation, &position.qaGuardRotation, nullptr);
-        }
-
-        CheckingPosMenu(iSlot, sMap.c_str(), sKey.c_str()); 
-    });
-
-    menus_api->DisplayPlayerMenu(hMenu, iSlot, true, true);
-}
-
-void CheckPosMenu(int iSlot){
-    if (iSlot < 0 || iSlot > MAX_PLAYERS) return;
-    if (!admin_api->IsAdmin(iSlot) || !admin_api->HasPermission(iSlot, g_sAdminPermission.c_str())) {
-        PrintSlotPrefixed(iSlot, GetTranslation("Duels_NoPermission"));
-        return;
-    }
-
-    Menu hMenu;
-    menus_api->SetTitleMenu(hMenu, GetTranslation("Duels_CheckPosTitle"));
-    
-    std::string curMapName = gpGlobals->mapname.ToCStr();
-    bool bHasPositions = false;
-
-    for (const auto& duelpos : g_DuelPositions) {
-        if (duelpos.sMapName == curMapName) {
-            for (const auto& pos : duelpos.vPositions) {
-                menus_api->AddItemMenu(hMenu, pos.KeyName.c_str(), pos.KeyName.c_str(), ITEM_DEFAULT);
-                bHasPositions = true;
-            }
-            break;
-        }
-    }
-
-    if (!bHasPositions) {
-        menus_api->AddItemMenu(hMenu, "", GetTranslation("Duels_NoAvailableMapPositions"), ITEM_DISABLED);
-    }
-
-    menus_api->SetBackMenu(hMenu, true);
-    menus_api->SetExitMenu(hMenu, true);
-
-    menus_api->SetCallback(hMenu, [curMapName](const char* szBack, const char* szFront, int iItem, int iSlot) {
-        if (!szBack || szBack[0] == '\0') return;
-        
-        if (strcmp(szBack, "exit") == 0) {
-            menus_api->ClosePlayerMenu(iSlot);
-            return;
-        }
-        if (strcmp(szBack, "back") == 0) {
-            OpenAdminMenu(iSlot);
-            return;
-        }
-
-        CheckingPosMenu(iSlot,curMapName.c_str(),szBack);
-    });
-    menus_api->DisplayPlayerMenu(hMenu,iSlot,true,true);
-}
-
-void DeletePosMenu(int iSlot) {
-    if (iSlot < 0 || iSlot > MAX_PLAYERS) return;
-    if (!admin_api->IsAdmin(iSlot) || !admin_api->HasPermission(iSlot, g_sAdminPermission.c_str())) {
-        PrintSlotPrefixed(iSlot, GetTranslation("Duels_NoPermission"));
-        return;
-    }
-
-    Menu hMenu;
-    menus_api->SetTitleMenu(hMenu, GetTranslation("Duels_DeletePosTitle"));
-    
-    std::string curMapName = gpGlobals->mapname.ToCStr();
-    bool bHasPositions = false;
-
-    for (const auto& duelpos : g_DuelPositions) {
-        if (duelpos.sMapName == curMapName) {
-            for (const auto& pos : duelpos.vPositions) {
-                menus_api->AddItemMenu(hMenu, pos.KeyName.c_str(), pos.KeyName.c_str(), ITEM_DEFAULT);
-                bHasPositions = true;
-            }
-            break;
-        }
-    }
-
-    if (!bHasPositions) {
-        menus_api->AddItemMenu(hMenu, "", GetTranslation("Duels_NoAvailableMapPositions"), ITEM_DISABLED);
-    }
-
-    menus_api->SetBackMenu(hMenu, true);
-    menus_api->SetExitMenu(hMenu, true);
-
-    menus_api->SetCallback(hMenu, [](const char* szBack, const char* szFront, int iItem, int iSlot) {
-        if (!szBack || szBack[0] == '\0') return;
-        
-        if (strcmp(szBack, "exit") == 0) {
-            menus_api->ClosePlayerMenu(iSlot);
-            return;
-        }
-        if (strcmp(szBack, "back") == 0) {
-            OpenAdminMenu(iSlot);
-            return;
-        }
-
-        RemoveDuelPosition(gpGlobals->mapname.ToCStr(), szBack);
-        PrintSlotPrefixed(iSlot, GetTranslation("Duels_PositionDeleted")); 
-        DeletePosMenu(iSlot); 
-    });
-
-    menus_api->DisplayPlayerMenu(hMenu, iSlot, true, true);
-}
-
-struct AdminSetupState {
-    PositionInfo pos;
-    bool bTPos = false;
-    bool bCTPos = false;
-    std::string textkeyname;
-};
-std::map<int, AdminSetupState> g_AdminSetup;
-bool bWaitingCustomTextSlot[64] = {false};
-
-
-void CreateNewPosMenu(int iSlot){
-    if (iSlot < 0 || iSlot > MAX_PLAYERS) return;
-    if (!admin_api->IsAdmin(iSlot) || !admin_api->HasPermission(iSlot, g_sAdminPermission.c_str())) {
-        PrintSlotPrefixed(iSlot, GetTranslation("Duels_NoPermission"));
-        return;
-    }
-
-    Menu hMenu;
-
-    menus_api->SetTitleMenu(hMenu,GetTranslation("Duels_CreatePosTitle"));
-    
-    char t_item[128], ct_item[128];
-    g_SMAPI->Format(t_item, sizeof(t_item), "%s [%s]", GetTranslation("Duels_SaveTPos"), g_AdminSetup[iSlot].bTPos ? "+" : "-");
-    g_SMAPI->Format(ct_item, sizeof(ct_item), "%s [%s]", GetTranslation("Duels_SaveCTPos"), g_AdminSetup[iSlot].bCTPos ? "+" : "-");
-
-    menus_api->AddItemMenu(hMenu, "zek", t_item, ITEM_DEFAULT);
-    menus_api->AddItemMenu(hMenu, "guard", ct_item, ITEM_DEFAULT);
-    menus_api->AddItemMenu(hMenu, "save", GetTranslation("Duels_SavePos"), ITEM_DEFAULT);
-    menus_api->AddItemMenu(hMenu, "return", GetTranslation("Duels_ReturnButton"), ITEM_DEFAULT);
-
-    menus_api->SetExitMenu(hMenu, true);
-
-    menus_api->SetCallback(hMenu, [](const char* szBack, const char* szFront, int iItem, int iSlot) {
-        if (!szBack || szBack[0] == '\0') return;
-        
-        if (strcmp(szBack, "exit") == 0) {
-            g_AdminSetup.erase(iSlot); 
-            menus_api->ClosePlayerMenu(iSlot);
-            return;
-        }
-        if (strcmp(szBack, "return") == 0) {
-            g_AdminSetup.erase(iSlot);
-            OpenAdminMenu(iSlot);
-            return;
-        }
-        if (strcmp(szBack, "zek") == 0) {
-            auto pController = CCSPlayerController::FromSlot(iSlot);
-            if (pController && pController->GetPlayerPawn()) {
-                g_AdminSetup[iSlot].pos.vPrisonerLocation = pController->GetPlayerPawn()->GetAbsOrigin();
-                g_AdminSetup[iSlot].pos.qaPrisonerRotation = pController->GetPlayerPawn()->GetAngRotation();
-                g_AdminSetup[iSlot].bTPos = true;
-                PrintSlotPrefixed(iSlot, GetTranslation("Duels_TPosSaved"));
-            }
-            CreateNewPosMenu(iSlot); 
-            return;
-        }
-        if (strcmp(szBack, "guard") == 0) { 
-            auto pController = CCSPlayerController::FromSlot(iSlot);
-            if (pController && pController->GetPlayerPawn()) {
-                g_AdminSetup[iSlot].pos.vGuardLocation = pController->GetPlayerPawn()->GetAbsOrigin();
-                g_AdminSetup[iSlot].pos.qaGuardRotation = pController->GetPlayerPawn()->GetAngRotation();
-                g_AdminSetup[iSlot].bCTPos = true;
-                PrintSlotPrefixed(iSlot, GetTranslation("Duels_CTPosSaved"));
-            }
-            CreateNewPosMenu(iSlot); 
-            return;
-        }
-        if (strcmp(szBack, "save") == 0) {
-            if (!g_AdminSetup[iSlot].bTPos) {
-                PrintSlotPrefixed(iSlot, GetTranslation("Duels_NoTPosInstalled"));
-                CreateNewPosMenu(iSlot);
-                return;
-            }
-            if (!g_AdminSetup[iSlot].bCTPos) { 
-                PrintSlotPrefixed(iSlot, GetTranslation("Duels_NoCTPosInstalled"));
-                CreateNewPosMenu(iSlot);
-                return;
-            }
-
-            bWaitingCustomTextSlot[iSlot] = true;
-            
-            PrintSlotPrefixed(iSlot,GetTranslation("Duels_EnterKeyName"));
-            menus_api->ClosePlayerMenu(iSlot);
-        }
-    });
-
-    menus_api->DisplayPlayerMenu(hMenu, iSlot, true, true);
-}
-
-void OpenAdminMenu(int iSlot) {
-    if  (iSlot < 0 || iSlot > MAX_PLAYERS) return;
-    if (!admin_api->IsAdmin(iSlot) || !admin_api->HasPermission(iSlot,g_sAdminPermission.c_str())) {
-        PrintSlotPrefixed(iSlot,GetTranslation("Duels_NoPermission"));
-        return;
-    }
-    g_AdminSetup.erase(iSlot);
-    bWaitingCustomTextSlot[iSlot] = false;
-    Menu hMenu;
-    menus_api->SetTitleMenu(hMenu,GetTranslation("Duels_AdminMenuTitle"));
-    menus_api->AddItemMenu(hMenu,"new",GetTranslation("Duels_CreateNewPos"),ITEM_DEFAULT);
-    menus_api->AddItemMenu(hMenu,"delete",GetTranslation("Duels_DeletePos"),ITEM_DEFAULT);
-    menus_api->AddItemMenu(hMenu,"check",GetTranslation("Duels_CheckPos"),ITEM_DEFAULT);
-    
-    menus_api->SetExitMenu(hMenu,true);
-
-    menus_api->SetCallback(hMenu,[](const char* szBack, const char* szFront, int iItem, int iSlot){
-        if (!szBack || szBack[0] == '\0') return;
-        if (strcmp(szBack,"exit") == 0) {
-            menus_api->ClosePlayerMenu(iSlot);
-            return;
-        }
-        if (strcmp(szBack,"new") == 0) {
-            CreateNewPosMenu(iSlot);
-            return;
-        }
-        if (strcmp(szBack,"delete") == 0) {
-            DeletePosMenu(iSlot);
-            return;
-        }
-
-        if (strcmp(szBack,"check") == 0) {
-            CheckPosMenu(iSlot);
-            return;
-        }
-
-    });
-    menus_api->DisplayPlayerMenu(hMenu,iSlot,true,true);
-}
-
-bool OnAdminCommand(int iSlot, const char* content) {
-    if  (iSlot < 0 || iSlot > MAX_PLAYERS) return true;
-    if (!admin_api->IsAdmin(iSlot) || !admin_api->HasPermission(iSlot,g_sAdminPermission.c_str())) {
-        PrintSlotPrefixed(iSlot,GetTranslation("Duels_NoPermission"));
-        return true;
-    }
-    OpenAdminMenu(iSlot);
-    return false;
-}
-
 
 
 
@@ -1374,32 +1011,6 @@ void jb_lr_duels::AllPluginsLoaded() {
         }
     });
 
-    utils->AddChatListenerPre(g_PLID, [](int iSlot, const char* szContent, bool bTeam){
-        if (!bWaitingCustomTextSlot[iSlot]) return true;
-        std::string sInput = szContent;
-        sInput.erase(std::remove(sInput.begin(), sInput.end(), '\"'), sInput.end());
-        if (sInput.empty()) {
-            PrintSlotPrefixed(iSlot, GetTranslation("Duels_EmptyInputRetry"));
-            return false;
-        }
-
-        g_AdminSetup[iSlot].textkeyname = sInput;
-        PrintSlotPrefixed(iSlot,GetTranslation("Duels_PositionSaved"));
-        SaveNewDuelPosition(
-            gpGlobals->mapname.ToCStr(),
-            g_AdminSetup[iSlot].textkeyname.c_str(),
-            g_AdminSetup[iSlot].pos.vPrisonerLocation,
-            g_AdminSetup[iSlot].pos.qaPrisonerRotation,
-            g_AdminSetup[iSlot].pos.vGuardLocation,
-            g_AdminSetup[iSlot].pos.qaGuardRotation
-        );
-        g_AdminSetup.erase(iSlot);
-        bWaitingCustomTextSlot[iSlot] = false;
-        OpenAdminMenu(iSlot);
-        
-        return false;
-    });
-
     utils->HookOnTakeDamagePre(g_PLID, [](int iSlot, CTakeDamageInfo *pInfo) {
         if (!g_bDuelStarted) return true; 
 
@@ -1439,8 +1050,6 @@ void jb_lr_duels::AllPluginsLoaded() {
         return true;
     });
 
-    utils->RegCommand(g_PLID,{"mm_jb_duels"},{"!jb_duels"},OnAdminCommand);
-
     utils->StartupServer(g_PLID, StartupServer);
 }
 
@@ -1461,4 +1070,4 @@ const char* jb_lr_duels::GetLicense() { return "GPL"; }
 const char* jb_lr_duels::GetLogTag() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetName() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetURL() { return "https://t.me/niffox_2q"; }
-const char* jb_lr_duels::GetVersion() { return "1.1.1"; }
+const char* jb_lr_duels::GetVersion() { return "1.1.2"; }
