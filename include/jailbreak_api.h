@@ -40,7 +40,7 @@ public:
 
     virtual void GiveLR(int iSlot) = 0;     // After obtaining last request auto firing OnGiveLR
     virtual int  GetLRPrisoner() = 0;  // Return player slot
-    virtual void ClearLR(int iSlot) = 0;    // -1 is default
+    virtual void ClearLR() = 0;    // -1 is default
 
     virtual void RegisterGameFeature(SourceMM::PluginId id,const std::string& keyName, const std::string& displayName, std::function<void(int)> onStart) = 0; // false is keyname already taken
     virtual void UnregisterGameFeature(SourceMM::PluginId id,const std::string& keyName) = 0;
@@ -68,5 +68,10 @@ public:
     virtual void OnClearLR(SourceMM::PluginId id,std::function<void()> listener) = 0;
 
     virtual void ClearAllPluginHooks(SourceMM::PluginId id) = 0;
+
+    virtual void GiveRebelImmunity(int iSlot) = 0;
+    virtual void RemoveRebelImmunity(int iSlot) = 0;
+    virtual bool IsRebelImmunity(int iSlot) = 0;
+
 
 };
