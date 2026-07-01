@@ -174,9 +174,21 @@ ConVarRefAbstract* FindConVar(const char* sCvarName)
     return new ConVarRefAbstract(g_pCVar->FindConVar(sCvarName));
 }
 
+void SafeKillEntity(CHandle<CBaseEntity>& hEnt) {
+    if (hEnt.IsValid()) {
+        CBaseEntity* pEnt = hEnt.Get();
+        if (pEnt) {
+            utils->AcceptEntityInput(pEnt, "Kill");
+        }
+    }
+    hEnt = nullptr; 
+}
+
 
 struct DuelContext {
     int iDuelSessionId = 0;
+
+    CHandle<CBaseEntity> hBeamEnt = nullptr;
 
     int iInitiatorSlot = -1; 
     int iTargetSlot = -1; 
@@ -193,6 +205,7 @@ struct DuelContext {
     std::string sModificatorDisplay = GetTranslation("Duels_DefaultDiplayName");
 
     void Reset() {
+        SafeKillEntity(hBeamEnt);
         iInitiatorSlot = -1;
 
         iTargetSlot = -1;
@@ -216,10 +229,40 @@ struct DuelContext {
 };
 
 DuelContext g_Duel;
-
 void OnGameFrame(bool sim, bool first, bool last){
-    if (!g_bDuelStarted && !g_bNoScopeActive) return;
+    if (!g_bDuelStarted) return;
 
+    if (g_Duel.hBeamEnt.IsValid()){
+    auto pEnt = g_Duel.hBeamEnt.Get();
+    if (!pEnt) return;
+
+    auto cInitiator = CCSPlayerController::FromSlot(g_Duel.iInitiatorSlot);
+    if (!cInitiator || !cInitiator->GetPlayerPawn() || !cInitiator->GetPlayerPawn()->IsAlive()) {
+        SafeKillEntity(g_Duel.hBeamEnt);
+        return; 
+    }
+
+    auto cTarget = CCSPlayerController::FromSlot(g_Duel.iTargetSlot);
+    if (!cTarget || !cTarget->GetPlayerPawn() || !cTarget->GetPlayerPawn()->IsAlive()) {
+        SafeKillEntity(g_Duel.hBeamEnt);
+        return; 
+    }
+
+    CBeam* beam = (CBeam*)pEnt;
+
+    Vector vecInitiator = cInitiator->GetPlayerPawn()->GetAbsOrigin();
+    Vector vecTarget = cTarget->GetPlayerPawn()->GetAbsOrigin();
+
+    vecInitiator.z += 25.0f;
+    vecTarget.z += 25.0f;
+
+    utils->TeleportEntity(pEnt, &vecInitiator, nullptr, nullptr);
+
+    beam->m_vecEndPos = vecTarget;
+    utils->SetStateChanged(pEnt, "CBeam", "m_vecEndPos");
+}
+
+    if (!g_bNoScopeActive) return;
     for (int i = 0; i < MAX_PLAYERS; i++) {
         if (i != g_Duel.iInitiatorSlot && i != g_Duel.iTargetSlot) continue;
         auto pPlayer = CCSPlayerController::FromSlot(i);
@@ -396,6 +439,19 @@ void StartDuel() {
 
     jailbreak_api->GiveRebelImmunity(iSlot);
     g_bDuelStarted = true;
+
+    auto pBeamEnt = utils->CreateEntityByName("env_beam", -1);
+    if (pBeamEnt) {
+        CEntityKeyValues* kv = new CEntityKeyValues();
+        kv->SetFloat("life", 0.0f);
+        utils->DispatchSpawn(pBeamEnt, kv);
+
+        CBeam* beam = (CBeam*)pBeamEnt;
+        beam->m_fWidth = 3; 
+        beam->m_clrRender = {0,0,255,255};
+        
+        g_Duel.hBeamEnt = pBeamEnt->GetHandle();
+    }
 
     utils->CreateTimer(5.0f, [iCapturedSession]() {
 
@@ -1070,4 +1126,4 @@ const char* jb_lr_duels::GetLicense() { return "GPL"; }
 const char* jb_lr_duels::GetLogTag() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetName() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetURL() { return "https://t.me/niffox_2q"; }
-const char* jb_lr_duels::GetVersion() { return "1.1.2"; }
+const char* jb_lr_duels::GetVersion() { return "1.1.3"; }
