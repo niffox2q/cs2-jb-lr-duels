@@ -56,7 +56,7 @@ bool g_bOneBulletStarted = false;
 bool g_bNoScopeActive = false;
 
 // OneHP vars
-bool g_bOneHPStarted = true;
+bool g_bOneHPStarted = false;
 
 // Modificator vars
 bool g_bEnableNoZoomModificator;
@@ -492,7 +492,7 @@ void StartDuel() {
 
         utils->CreateTimer(30.0f, [iCapturedSession]() {
             if (!g_bDuelStarted || g_Duel.iDuelSessionId != iCapturedSession) {
-                return 1.0f; 
+                return -1.0f; 
             }
             
             int iT = g_Duel.iInitiatorSlot;
@@ -1126,4 +1126,4 @@ const char* jb_lr_duels::GetLicense() { return "GPL"; }
 const char* jb_lr_duels::GetLogTag() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetName() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetURL() { return "https://t.me/niffox_2q"; }
-const char* jb_lr_duels::GetVersion() { return "1.1.3"; }
+const char* jb_lr_duels::GetVersion() { return "1.1.4"; }
