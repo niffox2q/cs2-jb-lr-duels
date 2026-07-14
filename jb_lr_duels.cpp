@@ -425,9 +425,13 @@ void StartDuel() {
     tPawn->m_iMaxHealth  = g_Duel.iHP;
     tPawn->m_ArmorValue  = g_Duel.iArmor;
 
+    tPawn->m_flVelocityModifier = 1.0;
+
     ctPawn->m_iHealth    = g_Duel.iHP;
     ctPawn->m_iMaxHealth = g_Duel.iHP;
     ctPawn->m_ArmorValue = g_Duel.iArmor;
+
+    tPawn->m_flVelocityModifier = 1.0;
 
     players_api->RemoveWeapons(g_Duel.iInitiatorSlot);
     players_api->RemoveWeapons(g_Duel.iTargetSlot);
