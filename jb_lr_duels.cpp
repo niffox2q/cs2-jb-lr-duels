@@ -287,18 +287,21 @@ void OnGameFrame(bool sim, bool first, bool last){
     }
 }
 
-void EnableInfinityAmmo() {
-    auto Cvar = FindConVar("sv_infinite_ammo");
-    if (Cvar) {
-        Cvar->SetInt(2);
-        delete Cvar;
-    }
-}
-void DisableInfinityAmmo() {
-    auto Cvar = FindConVar("sv_infinite_ammo");
-    if (Cvar) {
-        Cvar->SetInt(0);
-        delete Cvar;
+void ClearDroppedWeapons() {
+    if (!g_pEntitySystem) return;
+    CEntityIdentity* pEnt = g_pEntitySystem->m_EntityList.m_pFirstActiveEntity;
+    for (; pEnt; pEnt = pEnt->m_pNext) {
+
+        auto pInstance = pEnt->m_pInstance;
+        CBaseEntity* pEntity = (CBaseEntity*)pInstance;
+
+        const char* classname = pEntity->m_pEntity->m_designerName.String();
+        
+        if (!classname || strncmp(classname, "weapon_", 7) != 0) continue;
+
+        if (pEntity->m_hOwnerEntity.Get().IsValid()) continue; 
+
+        utils->RemoveEntity(pEntity); 
     }
 }
 
@@ -310,7 +313,6 @@ void EndDuel(int iWinner){
     g_bNoScopeActive = false;
     g_bOneBulletStarted = false;
     g_bOneHPStarted = false;
-    DisableInfinityAmmo();
     auto pController = CCSPlayerController::FromSlot(iWinner);
     if (!pController) return;
     auto pPawn = pController->GetPlayerPawn();
@@ -351,8 +353,6 @@ void GiveSlotWeapon(int iSlot, const char* szWeapon) {
     auto pPawn = pController->GetPlayerPawn();
     if (!pPawn || !pPawn->IsAlive()) return;
 
-    players_api->RemoveWeapons(iSlot);
-
     auto itemService = pPawn->m_pItemServices.Get();
     if (itemService) {
         itemService->GiveNamedItem(szWeapon);
@@ -364,8 +364,6 @@ void RemoveAndGiveWeaponNoAmmo(int iSlot,const char* szWeapon) {
     if (!pController) return;
     auto pPawn = pController->GetPlayerPawn();
     if (!pPawn || !pPawn->IsAlive()) return;
-
-    players_api->RemoveWeapons(iSlot);
 
     auto itemService = pPawn->m_pItemServices.Get();
     if (itemService) {
@@ -421,22 +419,33 @@ void StartDuel() {
         players_api->Teleport(g_Duel.iTargetSlot, &selectedArena.vGuardLocation, nullptr, nullptr);
     }
 
+    players_api->RemoveWeapons(g_Duel.iInitiatorSlot);
+    players_api->RemoveWeapons(g_Duel.iTargetSlot);
+
     tPawn->m_iHealth     = g_Duel.iHP;
     tPawn->m_iMaxHealth  = g_Duel.iHP;
     tPawn->m_ArmorValue  = g_Duel.iArmor;
 
+    auto tService = tPawn->m_pItemServices.Get();
+    tService->m_bHasHelmet = true;
+
     tPawn->m_flVelocityModifier = 1.0;
+    ctPawn->m_flVelocityModifier = 1.0;
 
     ctPawn->m_iHealth    = g_Duel.iHP;
     ctPawn->m_iMaxHealth = g_Duel.iHP;
     ctPawn->m_ArmorValue = g_Duel.iArmor;
 
-    tPawn->m_flVelocityModifier = 1.0;
+    auto ctService = ctPawn->m_pItemServices.Get();
+    ctService->m_bHasHelmet = true;
 
-    players_api->RemoveWeapons(g_Duel.iInitiatorSlot);
-    players_api->RemoveWeapons(g_Duel.iTargetSlot);
-    
+    ClearDroppedWeapons();
     PrintAllPrefixed(GetTranslation("Duels_PrisonerStartedDuel"));
+    if (g_Duel.sModificator == "default") PrintAllPrefixed(GetTranslation("Duels_DefaultMode"));
+    else if (g_Duel.sModificator == "nozoom") PrintAllPrefixed(GetTranslation("Duels_NoZoomMode"));
+    else if (g_Duel.sModificator == "onehp") PrintAllPrefixed(GetTranslation("Duels_OneHPMode"));
+    else if (g_Duel.sModificator == "knifeonly") PrintAllPrefixed(GetTranslation("Duels_KnifeOnlyMode"));
+    else if (g_Duel.sModificator == "onebullet") PrintAllPrefixed(GetTranslation("Duels_OneBulletMode"));
 
     g_Duel.iDuelSessionId++;
     int iCapturedSession = g_Duel.iDuelSessionId;
@@ -456,6 +465,7 @@ void StartDuel() {
         
         g_Duel.hBeamEnt = pBeamEnt->GetHandle();
     }
+
 
     utils->CreateTimer(5.0f, [iCapturedSession]() {
 
@@ -487,7 +497,8 @@ void StartDuel() {
 
         if (g_Duel.sModificator == "onehp") {
             g_bOneHPStarted = true;
-            EnableInfinityAmmo();
+            GiveSlotWeapon(g_Duel.iInitiatorSlot, "weapon_knife");
+            GiveSlotWeapon(g_Duel.iTargetSlot, "weapon_knife");
         }
         
         if (g_Duel.sModificator == "nozoom") {
@@ -543,6 +554,7 @@ void OpenArmorMenu(int iSlot){
 
         if (iItem < 7) {
             g_Duel.iArmor = atoi(szBack);
+            DuelHubMenu(iSlot);
         }
     });
 
@@ -576,6 +588,7 @@ void OpenHPMenu(int iSlot){
 
         if (iItem < 7) {
             g_Duel.iHP = atoi(szBack);
+            DuelHubMenu(iSlot);
         }
     });
 
@@ -1071,6 +1084,25 @@ void jb_lr_duels::AllPluginsLoaded() {
         }
     });
 
+    utils->HookEvent(g_PLID,"grenade_thrown",[](const char* szName, IGameEvent* pEvent, bool bDontBroadcast){
+        if (g_bDuelStarted && g_bOneHPStarted) {
+            int iSlot = pEvent->GetInt("userid");
+            const char* szWeapon = pEvent->GetString("weapon");
+            if (strcmp(szWeapon, "decoy") != 0) return;
+            auto pController = CCSPlayerController::FromSlot(iSlot);
+            if (!pController) return;
+            auto pPawn = pController->GetPlayerPawn();
+            if (!pPawn || !pPawn->IsAlive()) return;
+            
+            auto itemServices = pPawn->m_pItemServices.Get();
+            auto weaponServices = pPawn->m_pWeaponServices.Get();
+            if (!itemServices || !weaponServices) return;
+
+            auto pDecoy = itemServices->GiveNamedItem("weapon_decoy");
+        }
+    });
+
+
     utils->HookOnTakeDamagePre(g_PLID, [](int iSlot, CTakeDamageInfo *pInfo) {
         if (!g_bDuelStarted) return true; 
 
@@ -1107,6 +1139,17 @@ void jb_lr_duels::AllPluginsLoaded() {
             }
         }
 
+        if (bVictimInDuel && bAttackerInDuel && g_bOneHPStarted) {
+            auto pWeaponHandle = pInfo->m_hAbility.Get(); 
+
+            if (pWeaponHandle.IsValid()) {
+                const char* szClassname = pWeaponHandle.Get()->GetClassname();
+                if (szClassname && (strstr(szClassname, "knife") != nullptr || strstr(szClassname, "bayonet") != nullptr)) {
+                    return false; 
+                }
+            }
+        }
+
         return true;
     });
 
@@ -1130,4 +1173,4 @@ const char* jb_lr_duels::GetLicense() { return "GPL"; }
 const char* jb_lr_duels::GetLogTag() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetName() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetURL() { return "https://t.me/niffox_2q"; }
-const char* jb_lr_duels::GetVersion() { return "1.1.4"; }
+const char* jb_lr_duels::GetVersion() { return "1.2"; }
