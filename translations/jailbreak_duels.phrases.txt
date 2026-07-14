@@ -198,137 +198,35 @@
         "ru"    "Вы не можете начать дуэль, так как вы мертвы."
         "ua"    "Ви не можете розпочати дуель, оскільки ви мертві."
     }
-    "Duels_NoPermission"
+    "Duels_NoZoomMode"
     {
-        "en"    "You do not have access."
-        "ru"    "У вас нет доступа."
-        "ua"    "У вас немає доступу."
+        "en"    "Mode: No Scope. You cannot use the scope."
+        "ru"    "Режим: Без прицела. Вы не можете включить прицел."
+        "ua"    "Режим: Без прицілу. Ви не можете увімкнути приціл."
     }
-    "Duels_TPZekPos"
+    "Duels_DefaultMode"
     {
-        "en"    "Teleport to T position"
-        "ru"    "Телепортироваться на позицию Т"
-        "ua"    "Телепортуватися на позицію Т"
+        "en"    "Mode: Default. No unusual changes."
+        "ru"    "Режим: Стандартный. Никаких необычных изменений."
+        "ua"    "Режим: Стандартний. Ніяких незвичайних змін."
     }
-    "Duels_TPGuardPos"
+    "Duels_OneHPMode"
     {
-        "en"    "Teleport to CT position"
-        "ru"    "Телепортироваться на позицию КТ"
-        "ua"    "Телепортуватися на позицію КТ"
+        "en"    "Mode: One HP. Decoy battle, knife damage is disabled."
+        "ru"    "Режим: Одно ХП. Битва на декоях, урон с ножа не проходит."
+        "ua"    "Режим: Одне ХП. Битва на декоях, шкода від ножа не проходить."
     }
-    "Duels_CheckPosTitle"
+    "Duels_KnifeOnlyMode"
     {
-        "en"    "Check positions"
-        "ru"    "Проверка позиций"
-        "ua"    "Перевірка позицій"
+        "en"    "Mode: Knives Only. Knife battle."
+        "ru"    "Режим: Только ножи. Битва на ножах."
+        "ua"    "Режим: Тільки ножі. Битва на ножах."
     }
-    "Duels_NoAvailableMapPositions"
+    "Duels_OneBulletMode"
     {
-        "en"    "No available positions on this map."
-        "ru"    "Нет доступных позиций на данной карте."
-        "ua"    "Немає доступних позицій на цій карті."
-    }
-    "Duels_PositionDeleted"
-    {
-        "en"    "Position successfully deleted."
-        "ru"    "Позиция успешно удалена."
-        "ua"    "Позицію успішно видалено."
-    }
-    "Duels_DeletePosTitle"
-    {
-        "en"    "Delete positions"
-        "ru"    "Удаление позиций"
-        "ua"    "Видалення позицій"
-    }
-    "Duels_CreatePosTitle"
-    {
-        "en"    "Create position"
-        "ru"    "Создать позицию"
-        "ua"    "Створити позицію"
-    }
-    "Duels_SaveTPos"
-    {
-        "en"    "Save T position"
-        "ru"    "Сохранить позицию для Т"
-        "ua"    "Зберегти позицію для Т"
-    }
-    "Duels_SaveCTPos"
-    {
-        "en"    "Save CT position"
-        "ru"    "Сохранить позицию для КТ"
-        "ua"    "Зберегти позицію для КТ"
-    }
-    "Duels_SavePos"
-    {
-        "en"    "Save positions"
-        "ru"    "Сохранить позиции"
-        "ua"    "Зберегти позиції"
-    }
-    "Duels_ReturnButton"
-    {
-        "en"    "Return"
-        "ru"    "Вернуться"
-        "ua"    "Повернутися"
-    }
-    "Duels_TPosSaved"
-    {
-        "en"    "Position for T side saved successfully."
-        "ru"    "Позиция для Т стороны успешно сохранена."
-        "ua"    "Позицію для Т сторони успішно збережено."
-    }
-    "Duels_CTPosSaved"
-    {
-        "en"    "Position for CT side saved successfully."
-        "ru"    "Позиция для КТ стороны успешно сохранена."
-        "ua"    "Позицію для КТ сторони успішно збережено."
-    }
-    "Duels_NoTPosInstalled"
-    {
-        "en"    "Failed to save. T position not set."
-        "ru"    "Не удалось сохранить. Позиция для Т не установлена."
-        "ua"    "Не вдалося зберегти. Позицію для Т не встановлено."
-    }
-    "Duels_NoCTPosInstalled"
-    {
-        "en"    "Failed to save. CT position not set."
-        "ru"    "Не удалось сохранить. Позиция для КТ не установлена."
-        "ua"    "Не вдалося зберегти. Позицію для КТ не встановлено."
-    }
-    "Duels_EnterKeyName"
-    {
-        "en"    "Enter a unique name (no spaces/symbols). E.g: BoxTSpawn"
-        "ru"    "Введите уникальное название (без пробелов/спец. символов). Пример: BoxTSpawn"
-        "ua"    "Введіть унікальну назву (без пробілів/спец. символів). Приклад: BoxTSpawn"
-    }
-    "Duels_AdminMenuTitle"
-    {
-        "en"    "Position management"
-        "ru"    "Управление позициями"
-        "ua"    "Керування позиціями"
-    }
-    "Duels_CreateNewPos"
-    {
-        "en"    "Create position"
-        "ru"    "Создать позицию"
-        "ua"    "Створити позицію"
-    }
-    "Duels_DeletePos"
-    {
-        "en"    "Delete position"
-        "ru"    "Удалить позицию"
-        "ua"    "Видалити позицію"
-    }
-    "Duels_CheckPos"
-    {
-        "en"    "Check position"
-        "ru"    "Проверить позицию"
-        "ua"    "Перевірити позицію"
-    }
-    "Duels_PositionSaved"
-    {
-        "en"    "Position saved successfully"
-        "ru"    "Позиция успешно сохранена"
-        "ua"    "Позицію успішно збережено"
+        "en"    "Mode: One Bullet. Shooting is done one bullet at a time in turns."
+        "ru"    "Режим: Одна пуля. Стрельба проводится по одной пуле и по очереди."
+        "ua"    "Режим: Одна куля. Стрільба проводиться по одній кулі та по черзі."
     }
 
 
