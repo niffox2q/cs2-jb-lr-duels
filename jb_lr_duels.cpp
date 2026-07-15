@@ -205,6 +205,10 @@ struct DuelContext {
     std::string sModificatorDisplay = GetTranslation("Duels_DefaultDiplayName");
 
     void Reset() {
+        if (iInitiatorSlot >= 0 && iInitiatorSlot < MAX_PLAYERS) {
+            jailbreak_api->RemoveRebelImmunity(iInitiatorSlot);
+        }
+
         SafeKillEntity(hBeamEnt);
         iInitiatorSlot = -1;
 
@@ -1173,4 +1177,4 @@ const char* jb_lr_duels::GetLicense() { return "GPL"; }
 const char* jb_lr_duels::GetLogTag() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetName() { return "[JB] LR Duels"; }
 const char* jb_lr_duels::GetURL() { return "https://t.me/niffox_2q"; }
-const char* jb_lr_duels::GetVersion() { return "1.2"; }
+const char* jb_lr_duels::GetVersion() { return "1.2.1"; }
